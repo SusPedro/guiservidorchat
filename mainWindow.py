@@ -9,8 +9,14 @@ form_class = uic.loadUiType(
 class MyWindowClass(QtGui.QMainWindow, form_class):
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
-        sys.stderr = file(os.path.join(os.path.dirname(sys.argv[0]), 'log', 'log.txt'), 'a')
+        sys.stderr = file(os.path.join(os.path.dirname(__file__), 'log', 'mainWindow.log'),'a')
         self.setupUi(self)
+        """icono"""
+        self.setWindowIcon(QtGui.QIcon(os.path.join(
+            os.path.dirname(sys.argv[0]),
+            'icons',
+            'icono.jpg'
+        )))
         """Conexiones"""
         self.btCon.clicked.connect(self.btconfn)
         self.btEnviar.clicked.connect(self.btenviarfn)
@@ -34,7 +40,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
     def getUsuario(self):
         nusu = ['',False]
-        while(nusu[1] == False):
+        while(nusu[1] == False or nusu[0] == ''):
             nusu = QtGui.QInputDialog.getText(self,
                                               "Nombre de usuario",
                                               "Nombre de usuario:",
@@ -47,7 +53,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
         self.s = socket.socket()
         try:
             self.lMensajes.append('conectando')
-            self.s.connect(("localhost", 44000))
+            self.s.connect(("10.215.5.208", 44000))
             self.lMensajes.append('conectado correctamente')
             self.r = recibido(self.s,self.lMensajes)
             self.r.setDaemon(True)
@@ -56,14 +62,15 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
             self.s.send(str(self.name))
         except Exception,e:
             self.lMensajes.append('error conectando')
-            sys.stderr.write(str(e))
+            sys.stderr.write(str(e)+"\n")
 
     def btenviarfn(self):
         try:
             self.msg = str(self.tbMensaje.text())
             self.s.send(self.msg)
         except Exception,e:
-            sys.stderr.write(str(e))
+            pass
+            sys.stderr.write(str(e)+"\n")
 
     def modificar(self,text):
         self.lMensajes.append(text)
@@ -71,6 +78,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 class recibido(threading.Thread):
     def __init__(self,socket,contenedor):
         threading.Thread.__init__(self)
+        sys.stderr = file(os.path.join(os.path.dirname(__file__), 'log', 'recibido.log'),'a')
         self.soc = socket
         self.contenedor = contenedor
 
@@ -80,8 +88,8 @@ class recibido(threading.Thread):
                 r = self.soc.recv( 128)
                 a = r.decode('utf-8')
                 self.contenedor.emit(QtCore.SIGNAL('sen'),str(a))
-            except Exception,e:
-                sys.stderr.write(str(e))
-
+            except Exception,e :
+                sys.stderr.write(str(e)+"\n")
+                pass
 
 
