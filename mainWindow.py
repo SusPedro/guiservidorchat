@@ -24,8 +24,18 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
                                QtCore.SIGNAL('sen'),
                                self.modificar
                                )
-
-
+        """context menu"""
+        self.tbMensaje.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
+        self.lMensajes.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
+        """elementos"""
+        self.btEnviar.setVisible(False)
+        self.tbMensaje.setVisible(False)
+        self.txtMensaje.setVisible(False)
+        self.lMensajes.setReadOnly(True)
+        """solo letras [A-Za-z]"""
+        regexp = QtCore.QRegExp('([a-zA-Z1-9+]+\s)*[a-zA-Z1-9+]+$')
+        validator = QtGui.QRegExpValidator(regexp)
+        self.tbMensaje.setValidator(validator)
 
     def keyPressEvent(self, event):
         key = event.key()
@@ -35,7 +45,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
 
     def closeEvent(self, evnt):
         self.s.close()
-        pass
         sys.exit()
 
     def getUsuario(self):
@@ -49,7 +58,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
         return nusu[0]
 
     def btconfn(self):
-        """Conectar servidor"""
         self.s = socket.socket()
         try:
             self.lMensajes.append('conectando')
@@ -60,6 +68,12 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
             self.r.start()
             self.name = self.getUsuario()
             self.s.send(str(self.name))
+            """elementos"""
+            self.btEnviar.setVisible(True)
+            self.btCon.setVisible(False)
+            self.btEnviar.setVisible(True)
+            self.tbMensaje.setVisible(True)
+            self.txtMensaje.setVisible(True)
         except Exception,e:
             self.lMensajes.append('error conectando')
             sys.stderr.write(str(e)+"\n")

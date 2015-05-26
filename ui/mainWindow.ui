@@ -6,9 +6,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>407</width>
-    <height>256</height>
+    <width>408</width>
+    <height>232</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>408</width>
+    <height>232</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>408</width>
+    <height>232</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Cliente</string>
@@ -17,7 +29,7 @@
    <widget class="QPushButton" name="btEnviar">
     <property name="geometry">
      <rect>
-      <x>310</x>
+      <x>320</x>
       <y>200</y>
       <width>75</width>
       <height>23</height>
@@ -55,7 +67,7 @@
      <rect>
       <x>20</x>
       <y>10</y>
-      <width>361</width>
+      <width>371</width>
       <height>181</height>
      </rect>
     </property>
@@ -63,8 +75,8 @@
    <widget class="QPushButton" name="btCon">
     <property name="geometry">
      <rect>
-      <x>310</x>
-      <y>230</y>
+      <x>320</x>
+      <y>200</y>
       <width>75</width>
       <height>23</height>
      </rect>
