@@ -12,24 +12,13 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
         sys.stderr = file(os.path.join(os.path.dirname(sys.argv[0]), 'log', 'log.txt'), 'a')
         self.setupUi(self)
         """Conexiones"""
+        self.btCon.clicked.connect(self.btconfn)
         self.btEnviar.clicked.connect(self.btenviarfn)
         QtCore.QObject.connect(self.lMensajes,
                                QtCore.SIGNAL('sen'),
                                self.modificar
                                )
-        """"""
-        """Conectar servidor"""
-        self.s = socket.socket()
-        try:
-            self.lMensajes.append('conectando')
-            self.s.connect(("192.168.1.36", 44000))
-            self.lMensajes.append('conectado correctamente')
-            self.r = recibido(self.s,self.lMensajes)
-            self.r.setDaemon(True)
-            self.r.start()
-        except Exception,e:
-            self.lMensajes.append('error conectando')
-            sys.stderr.write(str(e))
+
 
 
     def keyPressEvent(self, event):
@@ -51,8 +40,23 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
                                               "Nombre de usuario:",
                                               QtGui.QLineEdit.Normal
                                               )
-            sys.stderr.write(str(nusu[1]))
-        return nusu
+        return nusu[0]
+
+    def btconfn(self):
+        """Conectar servidor"""
+        self.s = socket.socket()
+        try:
+            self.lMensajes.append('conectando')
+            self.s.connect(("localhost", 44000))
+            self.lMensajes.append('conectado correctamente')
+            self.r = recibido(self.s,self.lMensajes)
+            self.r.setDaemon(True)
+            self.r.start()
+            self.name = self.getUsuario()
+            self.s.send(str(self.name))
+        except Exception,e:
+            self.lMensajes.append('error conectando')
+            sys.stderr.write(str(e))
 
     def btenviarfn(self):
         try:
