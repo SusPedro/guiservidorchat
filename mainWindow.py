@@ -1,16 +1,20 @@
 from PyQt4 import QtCore, QtGui, uic
 import os,sys,threading ,socket,thread
+from getUsuario import UserDialog
+from systemTrayIcon import SystemTrayIcon
 
 form_class = uic.loadUiType(
     os.path.join(os.path.dirname(sys.argv[0]), 'ui', 'mainWindow.ui')
 )[0]
 
+tray = None
 
 class MyWindowClass(QtGui.QMainWindow, form_class):
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
         sys.stderr = file(os.path.join(os.path.dirname(__file__), 'log', 'mainWindow.log'),'a')
         self.setupUi(self)
+        self.setWindowFlags(QtCore.Qt.WindowSystemMenuHint)
         """icono"""
         self.setWindowIcon(QtGui.QIcon(os.path.join(
             os.path.dirname(sys.argv[0]),
@@ -44,38 +48,34 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
             self.btEnviar.click()
 
     def closeEvent(self, evnt):
-        self.s.close()
-        sys.exit()
+        self.hide()
+        evnt.ignore()
 
     def getUsuario(self):
-        nusu = ['',False]
-        while(nusu[1] == False or nusu[0] == ''):
-            nusu = QtGui.QInputDialog.getText(self,
-                                              "Nombre de usuario",
-                                              "Nombre de usuario:",
-                                              QtGui.QLineEdit.Normal
-                                              )
-        return nusu[0]
+        info= UserDialog.getUsu()
+        while(info[0] == ''):
+            info = UserDialog.getUsu()
+        return info
 
     def btconfn(self):
         self.s = socket.socket()
         try:
             self.lMensajes.append('conectando')
-            self.s.connect(("10.215.5.208", 44000))
+            self.info = self.getUsuario()
+            self.lMensajes.append(str(self.info[0])+' '+str(self.info[1]))
+            self.s.connect((str(self.info[1]), 44000))
             self.lMensajes.append('conectado correctamente')
+            self.s.send(str(self.info[0]))
             self.r = recibido(self.s,self.lMensajes)
             self.r.setDaemon(True)
             self.r.start()
-            self.name = self.getUsuario()
-            self.s.send(str(self.name))
-            """elementos"""
             self.btEnviar.setVisible(True)
             self.btCon.setVisible(False)
             self.btEnviar.setVisible(True)
             self.tbMensaje.setVisible(True)
             self.txtMensaje.setVisible(True)
         except Exception,e:
-            self.lMensajes.append('error conectando')
+            self.lMensajes.append('Direccion Ip incorrecta')
             sys.stderr.write(str(e)+"\n")
 
     def btenviarfn(self):
@@ -89,6 +89,10 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
     def modificar(self,text):
         self.lMensajes.append(text)
 
+    @staticmethod
+    def setTray(tra):
+        global tray
+        tray = tra
 class recibido(threading.Thread):
     def __init__(self,socket,contenedor):
         threading.Thread.__init__(self)
@@ -97,12 +101,14 @@ class recibido(threading.Thread):
         self.contenedor = contenedor
 
     def run(self):
+        global tray
         while True:
             try:
                 r = self.soc.recv( 128)
                 a = r.decode('utf-8')
                 self.contenedor.emit(QtCore.SIGNAL('sen'),str(a))
-            except Exception,e :
+                tray.emit(QtCore.SIGNAL('emitir'),a)
+            except Exception, e:
                 sys.stderr.write(str(e)+"\n")
                 pass
 
