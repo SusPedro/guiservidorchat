@@ -1,5 +1,3 @@
-__ALL__ = ['SystemTrayIcon']
-
 from PyQt4 import QtGui,QtCore
 import sys
 import os

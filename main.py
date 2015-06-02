@@ -1,4 +1,4 @@
-from PyQt4 import QtGui,QtCore
+from PyQt4 import QtGui
 import sys
 from mainWindow import MyWindowClass
 from systemTrayIcon import SystemTrayIcon

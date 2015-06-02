@@ -1,7 +1,6 @@
 from PyQt4 import QtCore, QtGui, uic
-import os,sys,threading ,socket,thread
+import os,sys,threading ,socket
 from getUsuario import UserDialog
-from systemTrayIcon import SystemTrayIcon
 
 form_class = uic.loadUiType(
     os.path.join(os.path.dirname(sys.argv[0]), 'ui', 'mainWindow.ui')
@@ -62,7 +61,6 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
         try:
             self.lMensajes.append('conectando')
             self.info = self.getUsuario()
-            self.lMensajes.append(str(self.info[0])+' '+str(self.info[1]))
             self.s.connect((str(self.info[1]), 44000))
             self.lMensajes.append('conectado correctamente')
             self.s.send(str(self.info[0]))
@@ -82,6 +80,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
         try:
             self.msg = str(self.tbMensaje.text())
             self.s.send(self.msg)
+            self.tbMensaje.setText('')
         except Exception,e:
             pass
             sys.stderr.write(str(e)+"\n")
@@ -93,6 +92,7 @@ class MyWindowClass(QtGui.QMainWindow, form_class):
     def setTray(tra):
         global tray
         tray = tra
+
 class recibido(threading.Thread):
     def __init__(self,socket,contenedor):
         threading.Thread.__init__(self)

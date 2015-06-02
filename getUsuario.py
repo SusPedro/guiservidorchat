@@ -1,4 +1,4 @@
-from PyQt4 import QtCore, QtGui, uic
+from PyQt4 import QtCore, QtGui
 import os,sys
 
 
@@ -50,7 +50,7 @@ class UserDialog(QtGui.QDialog):
     @staticmethod
     def getUsu(parent = None):
         dialog = UserDialog(parent)
-        result = dialog.exec_()
+        dialog.exec_()
         usu, ip = dialog.usuinsert()
         return str(usu),str(ip)
 
